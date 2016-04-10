@@ -14,6 +14,7 @@ from . import helpers
 from .log import log
 from .webtrader import NotLoginError
 from .webtrader import WebTrader
+from .webtrader import NotLoginError
 
 VERIFY_CODE_POS = 0
 TRADE_MARKET = 1
@@ -117,7 +118,10 @@ class GFTrader(WebTrader):
 
     def format_response_data(self, data):
         if six.PY2:
-            return_data = json.loads(data.encode('utf-8'))
+            try:
+                return_data = json.loads(data.encode('utf-8'))
+            except ValueError:
+                return None
         else:
             return_data = json.loads(str(data, 'utf-8'))
         return return_data
