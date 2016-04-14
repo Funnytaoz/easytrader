@@ -194,5 +194,15 @@
   "exit": {
     "classname": "com.gf.etrade.control.AuthenticateControl",
     "method": "logout"
+  },
+  "blotter": {
+    "classname": "com.gf.etrade.control.StockUF2Control",
+    "method": "queryDRCJ",
+    "query_direction": 0,
+    "position_str": "",
+    "query_mode": 0,
+    "request_num": 100,
+    "start": 0,
+    "limit": 20
   }
 }
