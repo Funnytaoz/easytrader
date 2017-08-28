@@ -1,8 +1,11 @@
+# coding: utf-8
+
 import unittest
 from datetime import datetime
+from unittest import mock
 
 import easytrader
-from easytrader import JoinQuantFollower
+from easytrader import JoinQuantFollower, RiceQuantFollower
 from easytrader import helpers
 from easytrader.follower import BaseFollower
 
@@ -17,56 +20,6 @@ class TestEasytrader(unittest.TestCase):
 
         result = helpers.get_stock_type('sz162411')
         self.assertEqual(result, 'sz')
-
-    def test_format_response_data_type(self):
-        user = easytrader.use('ht')
-
-        test_data = [{
-            'current_amount': '187.00',
-            'current_balance': '200.03',
-            'stock_code': '000001'
-        }]
-        result = user.format_response_data_type(test_data)
-
-        self.assertIs(type(result[0]['current_amount']), int)
-        self.assertIs(type(result[0]['current_balance']), float)
-        self.assertIs(type(result[0]['stock_code']), str)
-
-        test_data = [{'position_str': '',
-                      'date': '',
-                      'fund_account': '',
-                      'stock_account': '',
-                      'stock_code': '',
-                      'entrust_bs': '',
-                      'business_price': '',
-                      'business_amount': '',
-                      'business_time': '',
-                      'stock_name': '',
-                      'business_status': '',
-                      'business_type': ''}]
-        result = user.format_response_data_type(test_data)
-
-    def test_ht_fix_error_data(self):
-        user = easytrader.use('ht')
-        test_data = {
-            'cssweb_code': 'error',
-            'cssweb_type': 'GET_STOCK_POSITON'
-        }
-
-        return_data = user.fix_error_data(test_data)
-        self.assertEqual(test_data, return_data)
-
-        test_data = [{
-            'stock_code': '162411',
-            'entrust_bs': '2'},
-            {'no_use_index': 'hello'}]
-
-        normal_return_data = [{
-            'stock_code': '162411',
-            'entrust_bs': '2'}]
-
-        return_data = user.fix_error_data(test_data)
-        self.assertEqual(return_data, normal_return_data)
 
     def test_helpers_grep_comma(self):
         test_data = '123'
@@ -99,6 +52,19 @@ class TestEasytrader(unittest.TestCase):
         normal_data = 1023.05
         result = helpers.str2num(test_data, 'float')
         self.assertAlmostEqual(result, normal_data)
+
+    def test_gf_check_account_live(self):
+        user = easytrader.use('gf')
+
+        test_data = None
+        with self.assertRaises(easytrader.webtrader.NotLoginError):
+            user.check_account_live(test_data)
+        self.assertFalse(user.heart_active)
+
+        test_data = {'success': False, 'data': [{}], 'total': 1}
+        with self.assertRaises(easytrader.webtrader.NotLoginError):
+            user.check_account_live(test_data)
+        self.assertFalse(user.heart_active)
 
 
 class TestXueQiuTrader(unittest.TestCase):
@@ -170,6 +136,19 @@ class TestFollower(unittest.TestCase):
         for string, result in cases:
             test = BaseFollower._is_number(string)
             self.assertEqual(test, result)
+
+    @mock.patch.object(BaseFollower, 'trade_worker', autospec=True)
+    def test_send_interval(self, mock_trade_worker):
+        cases = [(1, 1), (2, 2)]
+        for follower_cls in [JoinQuantFollower, RiceQuantFollower]:
+            for test_data, truth in cases:
+                follower = follower_cls()
+                try:
+                    follower.follow(None, None, send_interval=test_data)
+                except:
+                    pass
+                print(test_data, truth)
+                self.assertEqual(mock_trade_worker.call_args[1]['send_interval'], truth)
 
 
 if __name__ == '__main__':

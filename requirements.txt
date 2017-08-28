@@ -1,7 +1,6 @@
 bs4
 requests
 demjson
-anyjson
 dill
 click
 six
@@ -10,3 +9,4 @@ Pillow
 pytesseract
 pandas
 pyperclip
+rqopen-client
