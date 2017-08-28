@@ -116,10 +116,14 @@ class GFTrader(WebTrader):
         return r.content
 
     def format_response_data(self, data):
-        if six.PY2:
-            return_data = json.loads(data.encode('utf-8'))
-        else:
-            return_data = json.loads(str(data, 'utf-8'))
+        try:
+            if six.PY2:
+                return_data = json.loads(data.encode('utf-8'))
+            else:
+                return_data = json.loads(str(data, 'utf-8'))
+        except Exception as e:
+            log.error('format_response_data fail: data {}'.format(data))
+            return None
         return return_data
 
     def check_login_status(self, response):
