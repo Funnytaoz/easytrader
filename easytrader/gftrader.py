@@ -122,7 +122,7 @@ class GFTrader(WebTrader):
             else:
                 return_data = json.loads(str(data, 'utf-8'))
         except Exception as e:
-            log.error('format_response_data fail: data {}'.format(data))
+            log.error('format_response_data fail: exc {}, data {}'.format(e, data))
             return None
         return return_data
 
