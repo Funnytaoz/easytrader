@@ -578,7 +578,7 @@ class GFTrader(WebTrader):
         })
         return self.do(params)
 
-    def get_entrust(self, action_in):
+    def get_entrust(self, action_in=0):
         '''
 
         :param action_in: 当值为0，返回全部委托；当值为1时，返回可撤委托
