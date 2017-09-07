@@ -18,7 +18,7 @@ from .webtrader import WebTrader
 VERIFY_CODE_POS = 0
 TRADE_MARKET = 1
 SESSIONIDPOS = 32
-HOLDER_POS = 11
+HOLDER_POS = 12
 SH = 0
 SZ = 1
 
